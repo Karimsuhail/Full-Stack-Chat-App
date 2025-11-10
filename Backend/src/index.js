@@ -15,9 +15,14 @@ const PORT = process.env.PORT || 8080;
 const __dirname = path.resolve();
 
 // ✅ Middlewares
+
+console.log("Registering middleware: express.json");
 app.use(express.json({ limit: "50mb" }));
+console.log("Registering middleware: express.urlencoded");
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
+console.log("Registering middleware: cookieParser");
 app.use(cookieParser());
+console.log("Registering middleware: cors");
 app.use(
   cors({
     origin: process.env.CLIENT_URL || "http://localhost:5173",
@@ -26,15 +31,20 @@ app.use(
 );
 
 // ✅ Routes
+
+console.log("Registering route: /api/auth", typeof authRoutes);
 app.use("/api/auth", authRoutes);
+console.log("Registering route: /api/messages", typeof messageRoutes);
 app.use("/api/messages", messageRoutes);
 
 // ✅ Serve frontend build (Render uses production)
 if (process.env.NODE_ENV === "production") {
   const frontendPath = path.join(__dirname, "../frontend/dist");
+  console.log("Registering static middleware for frontend build at:", frontendPath);
   app.use(express.static(frontendPath));
 
   // ✅ Correct fallback route — fixes your current crash
+  console.log("Registering fallback route: *");
   app.get("*", (req, res) => {
     res.sendFile(path.join(frontendPath, "index.html"));
   });
