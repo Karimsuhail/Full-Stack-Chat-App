@@ -6,13 +6,14 @@ import path from "path";
 import mongoose from "mongoose"; // ⬅️ Needed for health check
 
 import { connectDB } from "./lib/db.js";
+
 import authRoutes from "./routes/auth.route.js";
 import messageRoutes from "./routes/message.route.js";
 import { app, server } from "./lib/socket.js";
 
 dotenv.config();
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT;
 const __dirname = path.resolve();
 
 // ✅ Increase payload limit for base64 images
@@ -23,8 +24,7 @@ app.use(cookieParser());
 // ✅ Update CORS for production (Render auto-sets your frontend URL)
 app.use(
   cors({
-    origin:
-      process.env.CLIENT_URL || "http://localhost:5173",
+    origin: "http://localhost:5173",
     credentials: true,
   })
 );
@@ -39,7 +39,7 @@ if (process.env.NODE_ENV === "production") {
 
   app.get("*", (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
-});
+  });
 }
 
 // ✅ Server start
