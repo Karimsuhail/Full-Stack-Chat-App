@@ -1,17 +1,22 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
 import { LogOut, MessageSquare, Settings, User } from "lucide-react";
 
 const Navbar = () => {
   const { logout, authUser } = useAuthStore();
+  const location = useLocation();
+  const currentPath = location.pathname;
+
+  // Professional uniform highlight styles
+  const activeClass =
+    "bg-primary/20 text-primary font-semibold border border-primary/40";
+  const inactiveClass = "hover:bg-base-200 border border-transparent";
 
   return (
-    <header
-      className="bg-base-100 border-b border-base-300 fixed w-full top-0 z-40 
-    backdrop-blur-lg"
-    >
+    <header className="bg-base-100 border-b border-base-300 fixed w-full top-0 z-40 backdrop-blur-lg">
       <div className="container mx-auto px-4 h-16">
         <div className="flex items-center justify-between h-full">
+          {/* Logo */}
           <div className="flex items-center gap-8">
             <Link
               to="/"
@@ -24,30 +29,41 @@ const Navbar = () => {
             </Link>
           </div>
 
+          {/* Right Buttons */}
           <div className="flex items-center gap-2">
+            {/* Settings */}
             <Link
-              to={"/settings"}
-              className={`
-              btn btn-sm gap-2 transition-colors
-              
-              `}
+              to="/settings"
+              className={`btn btn-sm gap-2 transition-all ${
+                currentPath === "/settings" ? activeClass : inactiveClass
+              }`}
             >
               <Settings className="w-4 h-4" />
               <span className="hidden sm:inline">Settings</span>
             </Link>
 
+            {/* Profile */}
             {authUser && (
-              <>
-                <Link to={"/profile"} className={`btn btn-sm gap-2`}>
-                  <User className="size-5" />
-                  <span className="hidden sm:inline">Profile</span>
-                </Link>
+              <Link
+                to="/profile"
+                className={`btn btn-sm gap-2 transition-all ${
+                  currentPath === "/profile" ? activeClass : inactiveClass
+                }`}
+              >
+                <User className="size-5" />
+                <span className="hidden sm:inline">Profile</span>
+              </Link>
+            )}
 
-                <button className="flex gap-2 items-center" onClick={logout}>
-                  <LogOut className="size-5" />
-                  <span className="hidden sm:inline">Logout</span>
-                </button>
-              </>
+            {/* Logout */}
+            {authUser && (
+              <button
+                className="flex gap-2 items-center hover:opacity-80 transition-all"
+                onClick={logout}
+              >
+                <LogOut className="size-5" />
+                <span className="hidden sm:inline">Logout</span>
+              </button>
             )}
           </div>
         </div>
@@ -55,4 +71,5 @@ const Navbar = () => {
     </header>
   );
 };
+
 export default Navbar;
