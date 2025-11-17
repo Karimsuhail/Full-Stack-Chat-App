@@ -90,18 +90,29 @@ export const updateProfile = async (req, res) => {
     const { profilePic } = req.body;
     const userId = req.user._id;
 
-    if (!profilePic) {
-      return res.status(400).json({ message: "Profile pic is required" });
+    // Allow removal: frontend sends null or empty string to remove profile pic
+    let profilePicUrl = "";
+
+    if (profilePic === null || profilePic === "") {
+      // remove profile picture (set to empty string)
+      profilePicUrl = "";
+    } else {
+      // Upload and standardize size to 500x500 (crop to fill)
+      const uploadResponse = await cloudinary.uploader.upload(profilePic, {
+        folder: "chat_app_profiles",
+        transformation: [{ width: 500, height: 500, crop: "fill" }],
+      });
+      profilePicUrl = uploadResponse.secure_url;
     }
 
-    const uploadResponse = await cloudinary.uploader.upload(profilePic);
     const updatedUser = await User.findByIdAndUpdate(
       userId,
-      { profilePic: uploadResponse.secure_url },
+      { profilePic: profilePicUrl },
       { new: true }
     );
 
-    res.status(200).json(updatedUser);
+    // Return object with `user` key — frontend expects `res.data.user`
+    res.status(200).json({ user: updatedUser, message: "Profile updated successfully" });
   } catch (error) {
     console.log("error in update profile:", error);
     res.status(500).json({ message: "Internal server error" });
